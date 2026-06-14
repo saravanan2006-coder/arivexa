@@ -1,0 +1,1927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boss's Digital Marketing Academy</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ink: #0e0e0f;
+    --paper: #f7f5f0;
+    --cream: #ede9e0;
+    --accent: #ff4d1c;
+    --accent2: #1a3fff;
+    --gold: #f5a623;
+    --green: #00b96b;
+    --muted: #6b6860;
+    --border: #d8d4ca;
+    --card: #ffffff;
+    --locked: #c5c2ba;
+    --radius: 10px;
+    --shadow: 0 2px 16px rgba(14,14,15,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── AUTH OVERLAY ── */
+  .auth-overlay {
+    position: fixed; inset: 0;
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+  }
+  .auth-overlay.hidden { display: none; }
+  .auth-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 36px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow);
+  }
+  .auth-card .auth-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .auth-card .auth-logo span { color: var(--accent); }
+  .auth-card .auth-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .auth-card label {
+    font-size: 12px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+  }
+  .auth-card input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'Space Grotesk', sans-serif;
+    margin-bottom: 14px;
+    background: var(--paper);
+    color: var(--ink);
+    transition: border-color 0.2s;
+  }
+  .auth-card input:focus { outline: none; border-color: var(--accent); }
+  .auth-card .btn { width: 100%; margin-top: 4px; }
+  .auth-card .auth-switch {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .auth-card .auth-switch a {
+    color: var(--accent);
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .auth-card .auth-error {
+    background: rgba(255,77,28,0.08);
+    color: #c73200;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 14px;
+    display: none;
+    border: 1px solid rgba(255,77,28,0.15);
+  }
+  .auth-card .auth-error.show { display: block; }
+  .auth-card input[type="password"] { font-family: 'JetBrains Mono', monospace; }
+
+  /* ── API KEY DIALOG ── */
+  /* ── LAYOUT ── */
+  .shell { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 280px;
+    background: var(--ink);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+    transition: transform 0.3s;
+  }
+  .sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--gold);
+    letter-spacing: -0.3px;
+  }
+  .logo span { color: var(--accent); }
+  .tagline { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .progress-ring-wrap {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .ring-label { font-size: 12px; color: rgba(255,255,255,0.5); }
+  .ring-pct { font-size: 22px; font-weight: 700; color: var(--gold); }
+
+  svg.ring { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 4; }
+  .ring-fill { fill: none; stroke: var(--gold); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+
+  .nav-section { padding: 12px 0; }
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    padding: 8px 20px 4px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: #fff; background: rgba(255,255,255,0.05); }
+  .nav-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(245,166,35,0.07); }
+  .nav-item .icon { width: 16px; text-align: center; opacity: 0.7; }
+  .nav-item .badge {
+    margin-left: auto;
+    font-size: 10px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 20px;
+    padding: 1px 7px;
+    font-weight: 600;
+  }
+  .nav-item .badge.done { background: var(--green); }
+  .nav-item .badge.locked { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.3); }
+  .nav-item.logout-item { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; }
+  .nav-item.logout-item:hover { color: var(--accent); }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 280px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .breadcrumb { font-size: 13px; color: var(--muted); }
+  .breadcrumb strong { color: var(--ink); }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .xp-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--ink);
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    border-left: 1px solid var(--border);
+    padding-left: 14px;
+  }
+  .user-avatar {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    font-family: 'DM Serif Display', serif;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 32px; max-width: 900px; }
+  .page.active { display: block; }
+
+  /* ── DASHBOARD ── */
+  .dash-hero {
+    background: var(--ink);
+    border-radius: 16px;
+    padding: 36px 40px;
+    color: #fff;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .dash-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -40px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,77,28,0.25) 0%, transparent 70%);
+  }
+  .dash-hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 32px;
+    line-height: 1.1;
+    margin-bottom: 8px;
+  }
+  .dash-hero h1 em { color: var(--gold); font-style: normal; }
+  .dash-hero p { color: rgba(255,255,255,0.6); font-size: 15px; max-width: 480px; line-height: 1.5; }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+  .stat-value { font-size: 28px; font-weight: 700; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .stat-value.orange { color: var(--accent); }
+  .stat-value.blue { color: var(--accent2); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.gold { color: var(--gold); }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .module-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .module-card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow); }
+  .module-card.locked { opacity: 0.5; cursor: not-allowed; }
+  .module-card.completed { border-color: var(--green); }
+  .module-card.active-card { border-color: var(--accent); }
+  .module-card .mc-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .module-card h3 { font-size: 14px; font-weight: 600; line-height: 1.3; margin-bottom: 6px; }
+  .module-card p { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .module-card .mc-status {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-size: 16px;
+  }
+  .module-card .mc-bar {
+    height: 3px;
+    background: var(--cream);
+    border-radius: 2px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+  .module-card .mc-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+  .module-card.completed .mc-bar-fill { background: var(--green); }
+
+  /* ── LESSON PAGE ── */
+  .lesson-header {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  .lesson-eyebrow {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .lesson-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .lesson-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .lesson-meta span { display: flex; align-items: center; gap: 4px; }
+
+  .lesson-body {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px;
+    line-height: 1.75;
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+  .lesson-body h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    margin: 28px 0 12px;
+    color: var(--ink);
+  }
+  .lesson-body h2:first-child { margin-top: 0; }
+  .lesson-body h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 20px 0 8px;
+    color: var(--ink);
+  }
+  .lesson-body p { margin-bottom: 14px; color: #2a2a2b; }
+  .lesson-body ul, .lesson-body ol { padding-left: 20px; margin-bottom: 14px; }
+  .lesson-body li { margin-bottom: 6px; color: #2a2a2b; }
+
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: rgba(255,77,28,0.04);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+  .callout.tip { border-color: var(--green); background: rgba(0,185,107,0.04); }
+  .callout.example { border-color: var(--accent2); background: rgba(26,63,255,0.04); }
+  .callout.warning { border-color: var(--gold); background: rgba(245,166,35,0.06); }
+  .callout-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  .callout.tip .callout-label { color: var(--green); }
+  .callout.example .callout-label { color: var(--accent2); }
+  .callout.warning .callout-label { color: var(--gold); }
+  .callout > .callout-label { color: var(--accent); }
+
+  .definition-box {
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .definition-box strong { display: block; font-size: 15px; margin-bottom: 4px; }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 16px 0;
+  }
+  .comparison-table th {
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+  .comparison-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .comparison-table tr:nth-child(even) td { background: var(--cream); }
+
+  /* ── EXERCISE BLOCK ── */
+  .exercise-block {
+    background: linear-gradient(135deg, #0e0e0f, #1a1a2e);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  .exercise-block h3 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .exercise-block p { color: rgba(255,255,255,0.8); font-size: 14px; margin-bottom: 10px; line-height: 1.6; }
+  .exercise-block ol { padding-left: 18px; }
+  .exercise-block li { color: rgba(255,255,255,0.75); font-size: 14px; margin-bottom: 8px; line-height: 1.5; }
+  .ex-textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 14px;
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 100px;
+    margin-top: 14px;
+  }
+  .ex-textarea::placeholder { color: rgba(255,255,255,0.3); }
+  .ex-textarea:focus { outline: none; border-color: var(--gold); }
+
+  /* ── QUIZ BLOCK ── */
+  .quiz-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+  }
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .quiz-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .quiz-progress { font-size: 13px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  .quiz-question { margin-bottom: 24px; }
+  .quiz-question p { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: var(--paper);
+  }
+  .quiz-option:hover { border-color: var(--accent); background: rgba(255,77,28,0.03); }
+  .quiz-option.selected { border-color: var(--accent2); background: rgba(26,63,255,0.06); }
+  .quiz-option.correct { border-color: var(--green); background: rgba(0,185,107,0.06); }
+  .quiz-option.wrong { border-color: var(--accent); background: rgba(255,77,28,0.06); }
+  .quiz-option .opt-key {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .quiz-feedback {
+    margin-top: 10px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb { background: rgba(0,185,107,0.08); color: #00875a; border: 1px solid rgba(0,185,107,0.2); }
+  .quiz-feedback.wrong-fb { background: rgba(255,77,28,0.06); color: #c73200; border: 1px solid rgba(255,77,28,0.15); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: 'Space Grotesk', sans-serif;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #e03a10; transform: translateY(-1px); }
+  .btn-secondary { background: var(--ink); color: #fff; }
+  .btn-secondary:hover { background: #222; }
+  .btn-outline { background: transparent; color: var(--ink); border: 1.5px solid var(--border); }
+  .btn-outline:hover { border-color: var(--ink); }
+  .btn-gold { background: var(--gold); color: var(--ink); }
+  .btn-gold:hover { background: #e0961a; }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-green:hover { background: #009958; }
+  .btn-danger { background: var(--accent); color: #fff; }
+  .btn-danger:hover { background: #e03a10; }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+
+  /* ── HOMEWORK ── */
+  .homework-block {
+    background: linear-gradient(135deg, #fff8e8, #fff3d4);
+    border: 1.5px solid var(--gold);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+  }
+  .homework-block h3 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #b87800;
+    margin-bottom: 12px;
+  }
+  .homework-block ul { padding-left: 18px; }
+  .homework-block li { font-size: 14px; margin-bottom: 8px; color: #3a2800; line-height: 1.5; }
+
+  /* ── CASE STUDY ── */
+  .case-study {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  .cs-header {
+    background: var(--ink);
+    color: #fff;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .cs-header .cs-icon { font-size: 22px; }
+  .cs-header .cs-title { font-size: 14px; font-weight: 700; }
+  .cs-header .cs-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .cs-body { padding: 18px 20px; background: var(--cream); font-size: 14px; line-height: 1.65; }
+  .cs-body p { margin-bottom: 10px; }
+
+  /* ── PROGRESS TRACKER ── */
+  .progress-page .prog-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .prog-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .prog-row:last-child { border-bottom: none; }
+  .prog-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .prog-icon.done { background: rgba(0,185,107,0.1); }
+  .prog-icon.active { background: rgba(255,77,28,0.1); }
+  .prog-icon.locked { background: var(--cream); }
+  .prog-info { flex: 1; }
+  .prog-info .pi-title { font-size: 14px; font-weight: 600; }
+  .prog-info .pi-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .prog-bar-wrap { width: 120px; }
+  .prog-bar { height: 6px; background: var(--cream); border-radius: 3px; overflow: hidden; }
+  .prog-bar-inner { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.5s; }
+  .prog-bar-inner.done { background: var(--green); }
+  .prog-pct { font-size: 12px; color: var(--muted); text-align: right; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── TOOLS PAGE ── */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .tool-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tool-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .tool-card .tc-icon { font-size: 30px; margin-bottom: 10px; }
+  .tool-card .tc-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .tool-card .tc-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .tool-card .tc-status {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tc-status.free { background: rgba(0,185,107,0.1); color: var(--green); }
+  .tc-status.freemium { background: rgba(245,166,35,0.12); color: #a07000; }
+  .tc-status.paid { background: rgba(255,77,28,0.08); color: var(--accent); }
+
+  /* ── COMPLETE BUTTON ── */
+  .complete-lesson-bar {
+    background: var(--ink);
+    border-radius: 14px;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+  .complete-lesson-bar p { color: rgba(255,255,255,0.7); font-size: 14px; }
+  .complete-lesson-bar strong { color: #fff; display: block; font-size: 16px; margin-bottom: 2px; }
+
+  /* ── MOBILE MENU ── */
+  .menu-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px; right: 20px;
+    z-index: 200;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255,77,28,0.4);
+  }
+
+  /* ── AI MENTOR ── */
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .menu-toggle { display: flex; align-items: center; justify-content: center; }
+    .stats-row { grid-template-columns: repeat(2,1fr); }
+    .module-grid { grid-template-columns: 1fr; }
+    .tools-grid { grid-template-columns: repeat(2,1fr); }
+    .page { padding: 20px; }
+  }
+  @media (max-width: 600px) {
+    .dash-hero { padding: 24px; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .tools-grid { grid-template-columns: 1fr 1fr; }
+    .complete-lesson-bar { flex-direction: column; gap: 14px; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── AUTH OVERLAY ── -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-card" id="loginCard">
+    <div class="auth-logo">Boss's <span>DM</span> Academy</div>
+    <div class="auth-sub">Sign in to continue your learning journey</div>
+    <div class="auth-error" id="loginError"></div>
+    <label>Email or Username</label>
+    <input type="text" id="loginUsername" placeholder="Enter your email or username" autocomplete="username">
+    <label>Password</label>
+    <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+    <button class="btn btn-primary" onclick="handleLogin()">Sign In →</button>
+    <div class="auth-switch">Don't have an account? <a onclick="showSignup()">Create one</a></div>
+  </div>
+
+  <div class="auth-card" id="signupCard" style="display:none">
+    <div class="auth-logo">Boss's <span>DM</span> Academy</div>
+    <div class="auth-sub">Start your Digital Marketing journey today</div>
+    <div class="auth-error" id="signupError"></div>
+    <label>Your Name</label>
+    <input type="text" id="signupName" placeholder="e.g. Boss" autocomplete="name">
+    <label>Username</label>
+    <input type="text" id="signupUsername" placeholder="Choose a username" autocomplete="username">
+    <label>Password</label>
+    <input type="password" id="signupPassword" placeholder="Create a password (min 4 chars)" autocomplete="new-password">
+    <button class="btn btn-primary" onclick="handleSignup()">Create Account →</button>
+    <div class="auth-switch">Already have an account? <a onclick="showLogin()">Sign in</a></div>
+  </div>
+</div>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">Boss's <span>DM</span> Academy</div>
+      <div class="tagline">Digital Marketing · Zero to Pro</div>
+    </div>
+
+    <div class="progress-ring-wrap">
+      <svg class="ring" width="52" height="52" viewBox="0 0 52 52">
+        <circle class="ring-bg" cx="26" cy="26" r="22"/>
+        <circle class="ring-fill" id="ringCircle" cx="26" cy="26" r="22"
+          stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
+      </svg>
+      <div>
+        <div class="ring-label">Overall Progress</div>
+        <div class="ring-pct" id="ringPct">0%</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Navigation</div>
+      <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">🏠</span> Dashboard</div>
+      <div class="nav-item" onclick="showPage('progress')"><span class="icon">📊</span> My Progress</div>
+      <div class="nav-item" onclick="showPage('tools')"><span class="icon">🛠️</span> Tools Guide</div>
+      <div class="nav-item" onclick="showPage('glossary')"><span class="icon">📖</span> Glossary</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Course Modules</div>
+      <div class="nav-item" onclick="showLesson(1)" id="nav-1"><span class="icon">📘</span> M1: Intro to DM <span class="badge" id="badge-1">Active</span></div>
+      <div class="nav-item" onclick="showLesson(2)" id="nav-2"><span class="icon">🔍</span> M2: SEO Fundamentals <span class="badge locked" id="badge-2">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(3)" id="nav-3"><span class="icon">📱</span> M3: Social Media <span class="badge locked" id="badge-3">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(4)" id="nav-4"><span class="icon">✍️</span> M4: Content Marketing <span class="badge locked" id="badge-4">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(5)" id="nav-5"><span class="icon">📧</span> M5: Email Marketing <span class="badge locked" id="badge-5">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(6)" id="nav-6"><span class="icon">📢</span> M6: Google Ads <span class="badge locked" id="badge-6">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(7)" id="nav-7"><span class="icon">📘</span> M7: Meta Ads <span class="badge locked" id="badge-7">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(8)" id="nav-8"><span class="icon">📈</span> M8: Analytics <span class="badge locked" id="badge-8">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(9)" id="nav-9"><span class="icon">🔄</span> M9: Funnels & CRO <span class="badge locked" id="badge-9">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(10)" id="nav-10"><span class="icon">🎨</span> M10: Branding <span class="badge locked" id="badge-10">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(11)" id="nav-11"><span class="icon">💬</span> M11: Copywriting <span class="badge locked" id="badge-11">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(12)" id="nav-12"><span class="icon">🤝</span> M12: Affiliate & Influencer <span class="badge locked" id="badge-12">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(13)" id="nav-13"><span class="icon">📍</span> M13: Local SEO <span class="badge locked" id="badge-13">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(14)" id="nav-14"><span class="icon">🛒</span> M14: E-commerce <span class="badge locked" id="badge-14">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(15)" id="nav-15"><span class="icon">💼</span> M15: Freelancing <span class="badge locked" id="badge-15">🔒</span></div>
+      <div class="nav-item" onclick="showLesson(16)" id="nav-16"><span class="icon">🏢</span> M16: Agency Building <span class="badge locked" id="badge-16">🔒</span></div>
+    </div>
+
+    <div class="nav-item logout-item" onclick="handleLogout()"><span class="icon">🚪</span> Sign Out</div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="breadcrumb" id="breadcrumb"><strong>Dashboard</strong> — Digital Marketing Academy</div>
+      <div class="topbar-right">
+        <div class="xp-pill">⚡ <span id="xpDisplay">0</span> XP</div>
+        <div class="user-badge">
+          <div class="user-avatar" id="userAvatar">B</div>
+          <span id="userNameDisplay">Boss</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="dash-hero">
+        <h1>Welcome back, <em id="heroName">Boss</em> 👋<br>Ready to learn today?</h1>
+        <p>Your complete Digital Marketing journey from zero to professional. Work through each module, complete exercises, pass quizzes, and build real portfolio projects.</p>
+        <div class="btn-row" style="margin-top:20px">
+          <button class="btn btn-gold" onclick="showLesson(1)">▶ Continue Learning</button>
+          <button class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="showPage('progress')">📊 View Progress</button>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Modules Completed</div>
+          <div class="stat-value orange" id="statDone">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Quizzes Passed</div>
+          <div class="stat-value blue" id="statQuiz">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">XP Earned</div>
+          <div class="stat-value gold" id="statXP">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Streak (Days)</div>
+          <div class="stat-value green" id="statStreak">1</div>
+        </div>
+      </div>
+
+      <div class="section-title">📚 All Modules</div>
+      <div class="module-grid" id="moduleGrid">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+
+    <!-- LESSON PAGES -->
+    <div class="page" id="page-lesson1">
+      <div class="lesson-header">
+        <div class="lesson-eyebrow">Module 1 · Lesson 1 of 3</div>
+        <h1>Introduction to Marketing &amp; Digital Marketing</h1>
+        <div class="lesson-meta">
+          <span>⏱ 25 min</span>
+          <span>📖 Beginner</span>
+          <span>🎯 Foundation</span>
+        </div>
+      </div>
+
+      <div class="lesson-body" id="lesson1-content">
+
+        <h2>What is Marketing?</h2>
+        <p>Before we talk about <em>digital</em> marketing, you need to understand what <strong>marketing</strong> itself is. Don't worry — it's simpler than it sounds.</p>
+
+        <div class="definition-box">
+          <strong>📌 Marketing (Simple Definition)</strong>
+          Marketing is the process of getting the right product in front of the right people, at the right time, in a way that makes them want to buy it.
+        </div>
+
+        <p>Think about your grocery shop in Villupuram. When you arrange the best-selling items near the entrance, put price tags clearly on products, or tell your regular customers "new stock arrived" — that IS marketing. You are communicating value to potential buyers.</p>
+
+        <div class="callout example">
+          <div class="callout-label">🏪 Real World Example</div>
+          Imagine two grocery shops on the same street. Shop A has no board, no arrangement — items are scattered. Shop B has a clean signboard, products neatly arranged, a WhatsApp number visible, and weekly offers posted outside. Shop B will get more customers — not because their products are better, but because of <strong>better marketing</strong>.
+        </div>
+
+        <h2>The 4 Ps of Marketing (The Foundation)</h2>
+        <p>Every marketing concept in the world is built on 4 basics. Memorise these — they will appear everywhere in this course:</p>
+
+        <table class="comparison-table">
+          <tr><th>The P</th><th>What it means</th><th>Your Shop Example</th></tr>
+          <tr><td><strong>Product</strong></td><td>What you're selling</td><td>Rice, dal, oil, snacks</td></tr>
+          <tr><td><strong>Price</strong></td><td>How much you charge</td><td>₹50 for 1 kg sugar</td></tr>
+          <tr><td><strong>Place</strong></td><td>Where people can buy it</td><td>Your physical shop / online delivery</td></tr>
+          <tr><td><strong>Promotion</strong></td><td>How you tell people about it</td><td>WhatsApp offers, street banner, pamphlets</td></tr>
+        </table>
+
+        <h2>What is Digital Marketing?</h2>
+
+        <div class="definition-box">
+          <strong>📌 Digital Marketing (Simple Definition)</strong>
+          Digital Marketing is doing all your marketing activities using the internet and digital devices — like mobile phones, computers, websites, apps, and social media — instead of physical methods like pamphlets and hoardings.
+        </div>
+
+        <p>In the old days (Traditional Marketing), businesses used TV ads, newspaper ads, radio, hoardings, and pamphlets. These still work, but they are expensive and hard to measure.</p>
+
+        <p><strong>Digital Marketing solves both these problems</strong> — it's affordable (even free in many cases) and highly measurable. You can know exactly how many people saw your ad, clicked it, and bought something.</p>
+
+        <h2>Traditional vs Digital Marketing</h2>
+        <table class="comparison-table">
+          <tr><th>Feature</th><th>Traditional Marketing</th><th>Digital Marketing</th></tr>
+          <tr><td>Cost</td><td>Very expensive (₹50k+ for a newspaper ad)</td><td>Can start for FREE</td></tr>
+          <tr><td>Reach</td><td>Local / Regional only</td><td>Global — anyone with internet</td></tr>
+          <tr><td>Measurement</td><td>Hard to track results</td><td>Track everything in real-time</td></tr>
+          <tr><td>Targeting</td><td>Mass audience, no filtering</td><td>Target by age, location, interest, behavior</td></tr>
+          <tr><td>Interaction</td><td>One-way (you talk, they listen)</td><td>Two-way (conversation, comments, DMs)</td></tr>
+          <tr><td>Speed</td><td>Weeks to plan and run</td><td>Launch in minutes</td></tr>
+        </table>
+
+        <div class="callout tip">
+          <div class="callout-label">✅ Pro Tip</div>
+          The biggest brands in the world (Amazon, Zomato, Swiggy, Flipkart) spend 70–80% of their marketing budget on digital channels. That's where the audience is.
+        </div>
+
+        <h2>Types of Digital Marketing Channels</h2>
+        <p>Digital Marketing is not just "posting on Instagram." It's a large field with many different channels. In this course, you will master all of them:</p>
+        <ul>
+          <li><strong>SEO</strong> (Search Engine Optimization) — Getting your website to rank on Google for free</li>
+          <li><strong>Social Media Marketing</strong> — Instagram, Facebook, YouTube, LinkedIn, Twitter/X</li>
+          <li><strong>Content Marketing</strong> — Blogs, videos, podcasts, infographics</li>
+          <li><strong>Email Marketing</strong> — Sending targeted emails to customers</li>
+          <li><strong>Google Ads (PPC)</strong> — Paid ads on Google Search and YouTube</li>
+          <li><strong>Meta Ads</strong> — Paid ads on Facebook and Instagram</li>
+          <li><strong>Affiliate Marketing</strong> — Earning commission by promoting others' products</li>
+          <li><strong>Influencer Marketing</strong> — Working with social media influencers</li>
+          <li><strong>Analytics</strong> — Measuring and optimizing all your marketing</li>
+        </ul>
+
+        <h2>Why Digital Marketing is a High-Value Skill in 2025</h2>
+        <ul>
+          <li>💼 Average digital marketing fresher salary in India: ₹2.5–4 LPA</li>
+          <li>💼 Experienced digital marketer: ₹8–20 LPA</li>
+          <li>💰 Freelancers charge ₹15,000–1,00,000+ per month per client</li>
+          <li>🌍 Work from anywhere — laptop + internet is all you need</li>
+          <li>📈 India has 900 million+ internet users — massive opportunity</li>
+        </ul>
+
+        <div class="case-study">
+          <div class="cs-header">
+            <div class="cs-icon">📦</div>
+            <div>
+              <div class="cs-title">Case Study: Meesho's Digital Marketing Success</div>
+              <div class="cs-sub">Indian E-commerce · Bootstrapped to ₹10,000 Cr valuation</div>
+            </div>
+          </div>
+          <div class="cs-body">
+            <p>Meesho started as a small reselling app targeting women in Tier-2 and Tier-3 cities of India — exactly the kind of market in Villupuram and surrounding areas.</p>
+            <p><strong>How they grew using Digital Marketing:</strong> They used <strong>WhatsApp-based viral marketing</strong> (people shared products in groups), <strong>Facebook &amp; Instagram ads</strong> targeting housewives and small business owners, and <strong>YouTube content</strong> in regional languages explaining how to earn from home.</p>
+            <p><strong>Result:</strong> From 0 to 15 crore+ customers in under 5 years. Pure digital marketing — no TV ads initially.</p>
+            <p><strong>Lesson for you:</strong> Even small businesses with limited budgets can scale massively using smart digital marketing.</p>
+          </div>
+        </div>
+
+        <h2>The Digital Marketing Funnel (Big Picture)</h2>
+        <p>Here's the most important mental model in all of marketing — the <strong>Customer Journey Funnel</strong>. Every piece of marketing you do fits somewhere in this:</p>
+        <ul>
+          <li><strong>Awareness</strong> — Customer discovers you exist (Instagram post, Google search, YouTube video)</li>
+          <li><strong>Interest</strong> — They want to know more (visit your website, follow your page)</li>
+          <li><strong>Desire</strong> — They want your product (read reviews, compare prices)</li>
+          <li><strong>Action</strong> — They buy / contact / sign up</li>
+          <li><strong>Retention</strong> — They come back and buy again</li>
+          <li><strong>Advocacy</strong> — They tell friends about you (word of mouth)</li>
+        </ul>
+
+        <div class="callout warning">
+          <div class="callout-label">⚠️ Common Beginner Mistake</div>
+          Most beginners only focus on the bottom of the funnel (Action = making sales). But if nobody knows you exist (Awareness), you'll never get sales. You need to build ALL stages of the funnel. We will learn how to do this in every module.
+        </div>
+
+      </div>
+
+      <!-- EXERCISE -->
+      <div class="exercise-block">
+        <h3>🧪 Exercise — Module 1, Lesson 1</h3>
+        <p><strong>Task:</strong> Apply the 4 Ps to your own grocery shop or any local business you know.</p>
+        <ol>
+          <li>Write down the Product, Price, Place, and Promotion for your grocery shop.</li>
+          <li>Identify ONE thing about each "P" that could be improved using digital marketing.</li>
+          <li>Find ONE local Tamil Nadu business on Instagram and analyse how they market themselves.</li>
+        </ol>
+        <textarea class="ex-textarea" placeholder="Write your answers here... e.g. Product: Rice, dal, oil, groceries. Price: Market rate. Place: Physical shop in Villupuram. Promotion: Currently only word of mouth..."></textarea>
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="saveExercise(1)">💾 Save My Answer</button>
+        </div>
+      </div>
+
+      <!-- AI MENTOR -->
+      <!-- QUIZ -->
+      <div class="quiz-block" id="quiz1">
+        <div class="quiz-header">
+          <h3>📝 Module 1 Quiz — Test Your Knowledge</h3>
+          <div class="quiz-progress" id="qprog1">0 / 5 answered</div>
+        </div>
+
+        <div class="quiz-question" id="qq1">
+          <p>1. What does the "P" for Promotion in the 4 Ps of Marketing mean?</p>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answerQuiz(1,1,'A')"><span class="opt-key">A</span> The price you charge for a product</div>
+            <div class="quiz-option" onclick="answerQuiz(1,1,'B')"><span class="opt-key">B</span> How you communicate your product to potential customers</div>
+            <div class="quiz-option" onclick="answerQuiz(1,1,'C')"><span class="opt-key">C</span> Where you sell your product</div>
+            <div class="quiz-option" onclick="answerQuiz(1,1,'D')"><span class="opt-key">D</span> The quality of your product</div>
+          </div>
+          <div class="quiz-feedback" id="qfb1-1"></div>
+        </div>
+
+        <div class="quiz-question" id="qq2">
+          <p>2. Which of these is a major advantage of Digital Marketing over Traditional Marketing?</p>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answerQuiz(1,2,'A')"><span class="opt-key">A</span> It can only be done by large companies</div>
+            <div class="quiz-option" onclick="answerQuiz(1,2,'B')"><span class="opt-key">B</span> You can track and measure results in real-time</div>
+            <div class="quiz-option" onclick="answerQuiz(1,2,'C')"><span class="opt-key">C</span> It always costs more than traditional marketing</div>
+            <div class="quiz-option" onclick="answerQuiz(1,2,'D')"><span class="opt-key">D</span> It works only for tech companies</div>
+          </div>
+          <div class="quiz-feedback" id="qfb1-2"></div>
+        </div>
+
+        <div class="quiz-question" id="qq3">
+          <p>3. In the Customer Journey Funnel, which stage comes FIRST?</p>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answerQuiz(1,3,'A')"><span class="opt-key">A</span> Action (Purchase)</div>
+            <div class="quiz-option" onclick="answerQuiz(1,3,'B')"><span class="opt-key">B</span> Interest</div>
+            <div class="quiz-option" onclick="answerQuiz(1,3,'C')"><span class="opt-key">C</span> Awareness</div>
+            <div class="quiz-option" onclick="answerQuiz(1,3,'D')"><span class="opt-key">D</span> Desire</div>
+          </div>
+          <div class="quiz-feedback" id="qfb1-3"></div>
+        </div>
+
+        <div class="quiz-question" id="qq4">
+          <p>4. Meesho grew to 15 crore+ customers primarily using which strategy?</p>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answerQuiz(1,4,'A')"><span class="opt-key">A</span> TV and newspaper advertising</div>
+            <div class="quiz-option" onclick="answerQuiz(1,4,'B')"><span class="opt-key">B</span> WhatsApp viral marketing and social media ads</div>
+            <div class="quiz-option" onclick="answerQuiz(1,4,'C')"><span class="opt-key">C</span> Door-to-door salespeople</div>
+            <div class="quiz-option" onclick="answerQuiz(1,4,'D')"><span class="opt-key">D</span> Radio advertisements</div>
+          </div>
+          <div class="quiz-feedback" id="qfb1-4"></div>
+        </div>
+
+        <div class="quiz-question" id="qq5">
+          <p>5. Which is NOT a type of Digital Marketing channel?</p>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answerQuiz(1,5,'A')"><span class="opt-key">A</span> SEO (Search Engine Optimization)</div>
+            <div class="quiz-option" onclick="answerQuiz(1,5,'B')"><span class="opt-key">B</span> Email Marketing</div>
+            <div class="quiz-option" onclick="answerQuiz(1,5,'C')"><span class="opt-key">C</span> Newspaper Advertising</div>
+            <div class="quiz-option" onclick="answerQuiz(1,5,'D')"><span class="opt-key">D</span> Google Ads</div>
+          </div>
+          <div class="quiz-feedback" id="qfb1-5"></div>
+        </div>
+
+        <div id="quizResult1" style="display:none;margin-top:20px;padding:16px;background:var(--cream);border-radius:10px;font-size:14px;"></div>
+      </div>
+
+      <!-- HOMEWORK -->
+      <div class="homework-block">
+        <h3>📚 Homework — Due Before Module 2</h3>
+        <ul>
+          <li><strong>Task 1:</strong> Visit <a href="https://analytics.google.com" target="_blank" style="color:#b87800">Google Analytics</a> and create a free Google account if you don't have one. Explore the interface for 10 minutes.</li>
+          <li><strong>Task 2:</strong> Find 3 brands on Instagram in your niche (grocery, retail, or Tamil Nadu local brands). Write down: How often they post, what kind of content they share, and how many followers they have.</li>
+          <li><strong>Task 3:</strong> Open a notebook and write a 1-paragraph "Digital Marketing Plan" for your grocery shop — what channels would you use and why?</li>
+          <li><strong>Task 4:</strong> Watch any 1 video about "What is Digital Marketing" on YouTube to reinforce today's learning.</li>
+        </ul>
+      </div>
+
+      <!-- COMPLETE -->
+      <div class="complete-lesson-bar">
+        <div>
+          <strong>Ready to move to Module 2: SEO Fundamentals?</strong>
+          <p>Complete the quiz above first. Once you pass with 3/5, Module 2 unlocks.</p>
+        </div>
+        <button class="btn btn-gold" id="completebtn1" onclick="completeLesson(1)" disabled>🔒 Complete Module 1</button>
+      </div>
+    </div>
+
+    <!-- LESSON 2 (Teaser - unlocked after M1) -->
+    <div class="page" id="page-lesson2">
+      <div class="lesson-header">
+        <div class="lesson-eyebrow">Module 2 · SEO Fundamentals</div>
+        <h1>Search Engine Optimization — How Google Works</h1>
+        <div class="lesson-meta">
+          <span>⏱ 35 min</span>
+          <span>📖 Beginner-Intermediate</span>
+          <span>🎯 SEO</span>
+        </div>
+      </div>
+
+      <div class="lesson-body">
+        <h2>What is SEO?</h2>
+        <div class="definition-box">
+          <strong>📌 SEO — Search Engine Optimization</strong>
+          SEO is the practice of optimizing your website and content so that it appears higher in Google's (or other search engines') unpaid (organic) search results when people search for topics related to your business.
+        </div>
+
+        <p>Imagine you search "grocery shop near Villupuram" on Google. You'll see a list of results. The websites that appear on page 1 — especially the top 3 — get 90%+ of the clicks. SEO is the art and science of getting YOUR website to that top position.</p>
+
+        <div class="callout tip">
+          <div class="callout-label">💡 Key Insight</div>
+          Google processes 8.5 billion searches per day. Being on page 1 is like owning the most prime real estate in the world — and it can be FREE if you do SEO right.
+        </div>
+
+        <h2>How Does Google Search Work?</h2>
+        <p>Google uses automated programs called <strong>"crawlers" or "spiders"</strong> that continuously browse the internet, reading every page they find. Then Google stores all this information in a massive database called the <strong>Index</strong>.</p>
+        <p>When you search something, Google's <strong>Algorithm</strong> (a set of rules — over 200 of them!) decides which pages from the Index are most relevant and useful for your search, and shows them in order.</p>
+
+        <h3>The 3 Steps: Crawl → Index → Rank</h3>
+        <ul>
+          <li><strong>Crawl:</strong> Google's bots visit your website and read all your content</li>
+          <li><strong>Index:</strong> Google saves your content in its massive database</li>
+          <li><strong>Rank:</strong> When someone searches, Google picks the best pages from its index</li>
+        </ul>
+
+        <h2>The 3 Pillars of SEO</h2>
+        <table class="comparison-table">
+          <tr><th>Pillar</th><th>What it is</th><th>Example</th></tr>
+          <tr><td><strong>Technical SEO</strong></td><td>Making sure your website works properly — fast loading, mobile-friendly, no errors</td><td>Website loads in under 3 seconds</td></tr>
+          <tr><td><strong>On-Page SEO</strong></td><td>Optimizing the content on each page — keywords, headings, titles, images</td><td>Writing a blog post titled "Best Grocery Shops in Villupuram"</td></tr>
+          <tr><td><strong>Off-Page SEO</strong></td><td>Building trust and authority from outside your website — getting other websites to link to you</td><td>A local news site mentions your shop's website</td></tr>
+        </table>
+
+        <h2>Keywords — The Foundation of SEO</h2>
+        <div class="definition-box">
+          <strong>📌 Keyword</strong>
+          A keyword is any word or phrase that people type into Google when they're searching for something. Your SEO job is to figure out WHAT people are searching for and create content around those exact terms.
+        </div>
+
+        <h3>Types of Keywords</h3>
+        <ul>
+          <li><strong>Short-tail:</strong> 1-2 words ("grocery shop") — high search volume, very competitive</li>
+          <li><strong>Long-tail:</strong> 3+ words ("affordable grocery shop near Villupuram bus stand") — lower volume, less competition, easier to rank</li>
+          <li><strong>Local keywords:</strong> Include location ("grocery delivery Villupuram") — perfect for local businesses</li>
+          <li><strong>Informational:</strong> "how to store rice long term" — people looking for info, not buying yet</li>
+          <li><strong>Transactional:</strong> "buy organic rice online" — people ready to purchase</li>
+        </ul>
+
+        <div class="case-study">
+          <div class="cs-header">
+            <div class="cs-icon">🍕</div>
+            <div>
+              <div class="cs-title">Case Study: How a Coimbatore Restaurant Used SEO to Get 3x More Customers</div>
+              <div class="cs-sub">Local SEO Success Story — Tamil Nadu</div>
+            </div>
+          </div>
+          <div class="cs-body">
+            <p>A small restaurant in Coimbatore had almost no online presence. They started by creating a Google Business Profile, then built a simple website with pages like "Best Biryani in Coimbatore" and "Family Restaurant Near RS Puram."</p>
+            <p>They wrote 10 blog posts answering questions like "Best places to eat biryani in Coimbatore" and got a few local food bloggers to mention them.</p>
+            <p><strong>Result in 6 months:</strong> Their website appeared on page 1 for 12 local keywords. Table bookings increased by 3x. Zero rupees spent on ads.</p>
+          </div>
+        </div>
+
+        <h2>SEO Tools You Will Learn in This Module</h2>
+        <ul>
+          <li><strong>Google Search Console</strong> (Free) — See what people search to find your site</li>
+          <li><strong>Google Keyword Planner</strong> (Free) — Find keywords people are searching</li>
+          <li><strong>SEMrush / Ahrefs</strong> (Paid/Trial) — Professional keyword research and competitor analysis</li>
+          <li><strong>Ubersuggest</strong> (Free limited) — Good for beginners</li>
+        </ul>
+      </div>
+
+      <div class="exercise-block">
+        <h3>🧪 Exercise — Module 2</h3>
+        <p><strong>Keyword Research Exercise:</strong></p>
+        <ol>
+          <li>Go to Google and type "grocery shop" — note the "People Also Search" and autocomplete suggestions. These are real keywords!</li>
+          <li>Try searching "grocery [your town/district]" — write down 5 long-tail keywords you find.</li>
+          <li>Visit <a href="https://ads.google.com/home/tools/keyword-planner/" target="_blank" style="color:var(--gold)">Google Keyword Planner</a> (free with Google account) and look up "grocery shop Villupuram."</li>
+        </ol>
+        <textarea class="ex-textarea" placeholder="Write your 5 keywords here with estimated monthly search volume..."></textarea>
+        <div class="btn-row">
+          <button class="btn btn-gold" onclick="saveExercise(2)">💾 Save My Answer</button>
+        </div>
+      </div>
+
+      <div class="quiz-block" id="quiz2">
+        <div class="quiz-header">
+          <h3>📝 Module 2 Quiz</h3>
+          <div class="quiz-progress" id="qprog2">0 / 4 answered</div>
+        </div>
+
+        <div class="quiz-question">
+          <p>1. What does SEO stand for?</p>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answerQuiz(2,1,'A')"><span class="opt-key">A</span> Search Engine Operations</div>
+            <div class="quiz-option" onclick="answerQuiz(2,1,'B')"><span class="opt-key">B</span> Search Engine Optimization</div>
+            <div class="quiz-option" onclick="answerQuiz(2,1,'C')"><span class="opt-key">C</span> Social Engagement Online</div>
+            <div class="quiz-option" onclick="answerQuiz(2,1,'D')"><span class="opt-key">D</span> Search Engagement Output</div>
+          </div>
+          <div class="quiz-feedback" id="qfb2-1"></div>
+        </div>
+
+        <div class="quiz-question">
+          <p>2. What is a "long-tail keyword"?</p>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answerQuiz(2,2,'A')"><span class="opt-key">A</span> A keyword that is very popular and competitive</div>
+            <div class="quiz-option" onclick="answerQuiz(2,2,'B')"><span class="opt-key">B</span> A specific phrase with 3+ words, lower competition, easier to rank</div>
+            <div class="quiz-option" onclick="answerQuiz(2,2,'C')"><span class="opt-key">C</span> A keyword used only by large corporations</div>
+            <div class="quiz-option" onclick="answerQuiz(2,2,'D')"><span class="opt-key">D</span> A keyword with more than 10 words</div>
+          </div>
+          <div class="quiz-feedback" id="qfb2-2"></div>
+        </div>
+
+        <div class="quiz-question">
+          <p>3. What are the 3 correct steps in how Google processes websites?</p>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answerQuiz(2,3,'A')"><span class="opt-key">A</span> Search → Sort → Show</div>
+            <div class="quiz-option" onclick="answerQuiz(2,3,'B')"><span class="opt-key">B</span> Read → Store → Display</div>
+            <div class="quiz-option" onclick="answerQuiz(2,3,'C')"><span class="opt-key">C</span> Crawl → Index → Rank</div>
+            <div class="quiz-option" onclick="answerQuiz(2,3,'D')"><span class="opt-key">D</span> Download → Analyse → Publish</div>
+          </div>
+          <div class="quiz-feedback" id="qfb2-3"></div>
+        </div>
+
+        <div class="quiz-question">
+          <p>4. Which SEO tool is completely FREE and provided by Google itself?</p>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="answerQuiz(2,4,'A')"><span class="opt-key">A</span> SEMrush</div>
+            <div class="quiz-option" onclick="answerQuiz(2,4,'B')"><span class="opt-key">B</span> Ahrefs</div>
+            <div class="quiz-option" onclick="answerQuiz(2,4,'C')"><span class="opt-key">C</span> Google Search Console</div>
+            <div class="quiz-option" onclick="answerQuiz(2,4,'D')"><span class="opt-key">D</span> Moz Pro</div>
+          </div>
+          <div class="quiz-feedback" id="qfb2-4"></div>
+        </div>
+
+        <div id="quizResult2" style="display:none;margin-top:20px;padding:16px;background:var(--cream);border-radius:10px;font-size:14px;"></div>
+      </div>
+
+      <div class="homework-block">
+        <h3>📚 Homework — Module 2</h3>
+        <ul>
+          <li><strong>Task 1:</strong> Create a Google Search Console account and add a website (even a free one from sites like Google Sites).</li>
+          <li><strong>Task 2:</strong> Do keyword research for your grocery shop — find 20 relevant keywords using Google autocomplete and Keyword Planner.</li>
+          <li><strong>Task 3:</strong> Analyse a competitor website (any local grocery or supermarket with a website) — what keywords do they seem to be targeting?</li>
+          <li><strong>Task 4:</strong> Sign up for a free trial of SEMrush at semrush.com and explore the Keyword Overview tool.</li>
+        </ul>
+      </div>
+
+      <div class="complete-lesson-bar">
+        <div>
+          <strong>Module 2 Complete? Let's go to Social Media Marketing!</strong>
+          <p>Pass the quiz (3/4) to unlock Module 3.</p>
+        </div>
+        <button class="btn btn-gold" id="completebtn2" onclick="completeLesson(2)" disabled>🔒 Complete Module 2</button>
+      </div>
+    </div>
+
+    <!-- LOCKED LESSON PAGE (Generic for 3-16) -->
+    <div class="page" id="page-locked">
+      <div style="text-align:center;padding:80px 20px;">
+        <div style="font-size:64px;margin-bottom:16px;">🔒</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:12px">Module Locked</h2>
+        <p style="color:var(--muted);font-size:15px;max-width:400px;margin:0 auto 24px">Complete the previous module and pass its quiz to unlock this lesson. Your progress is saved automatically.</p>
+        <button class="btn btn-primary" onclick="showPage('dashboard')">← Back to Dashboard</button>
+      </div>
+    </div>
+
+    <!-- PROGRESS PAGE -->
+    <div class="page progress-page" id="page-progress">
+      <h1 style="font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:6px">My Learning Progress</h1>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:28px">Track your journey from beginner to professional digital marketer.</p>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Total Modules</div><div class="stat-value" style="color:var(--ink)">16</div></div>
+        <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value orange" id="pStatDone">0</div></div>
+        <div class="stat-card"><div class="stat-label">Total XP Possible</div><div class="stat-value gold">1600</div></div>
+        <div class="stat-card"><div class="stat-label">XP Earned</div><div class="stat-value green" id="pStatXP">0</div></div>
+      </div>
+
+      <div class="prog-section">
+        <div class="section-title" style="margin-bottom:4px">📚 Module Progress</div>
+        <div id="progressList"><!-- filled by JS --></div>
+      </div>
+    </div>
+
+    <!-- TOOLS PAGE -->
+    <div class="page" id="page-tools">
+      <h1 style="font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:6px">Industry Tools Guide</h1>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:28px">Every professional tool you'll learn in this course — with purpose, cost, and when to use it.</p>
+
+      <div class="tools-grid">
+        <div class="tool-card" onclick="showToolInfo('ga')">
+          <div class="tc-icon">📊</div>
+          <div class="tc-name">Google Analytics</div>
+          <div class="tc-desc">Track website visitors, traffic sources, conversions, and user behavior.</div>
+          <div class="tc-status free">Free</div>
+        </div>
+        <div class="tool-card" onclick="showToolInfo('gsc')">
+          <div class="tc-icon">🔍</div>
+          <div class="tc-name">Google Search Console</div>
+          <div class="tc-desc">Monitor how Google sees your website. Find keywords, errors, and ranking data.</div>
+          <div class="tc-status free">Free</div>
+        </div>
+        <div class="tool-card" onclick="showToolInfo('gads')">
+          <div class="tc-icon">📢</div>
+          <div class="tc-name">Google Ads</div>
+          <div class="tc-desc">Run paid search, display, YouTube, and Shopping ads across Google's network.</div>
+          <div class="tc-status paid">Pay-per-click</div>
+        </div>
+        <div class="tool-card" onclick="showToolInfo('meta')">
+          <div class="tc-icon">📘</div>
+          <div class="tc-name">Meta Ads Manager</div>
+          <div class="tc-desc">Create and manage ads on Facebook and Instagram with precise audience targeting.</div>
+          <div class="tc-status paid">Pay-per-click</div>
+        </div>
+        <div class="tool-card" onclick="showToolInfo('canva')">
+          <div class="tc-icon">🎨</div>
+          <div class="tc-name">Canva</div>
+          <div class="tc-desc">Design professional graphics, posts, banners, and presentations — no design skills needed.</div>
+          <div class="tc-status freemium">Freemium</div>
+        </div>
+        <div class="tool-card" onclick="showToolInfo('semrush')">
+          <div class="tc-icon">🔎</div>
+          <div class="tc-name">SEMrush</div>
+          <div class="tc-desc">Comprehensive SEO, keyword research, competitor analysis, and content planning.</div>
+          <div class="tc-status freemium">Freemium</div>
+        </div>
+        <div class="tool-card" onclick="showToolInfo('ahrefs')">
+          <div class="tc-icon">🔗</div>
+          <div class="tc-name">Ahrefs</div>
+          <div class="tc-desc">The gold standard for backlink analysis, keyword research, and site audits.</div>
+          <div class="tc-status paid">Paid</div>
+        </div>
+        <div class="tool-card" onclick="showToolInfo('hubspot')">
+          <div class="tc-icon">🧡</div>
+          <div class="tc-name">HubSpot</div>
+          <div class="tc-desc">All-in-one CRM, email marketing, and marketing automation platform.</div>
+          <div class="tc-status freemium">Freemium</div>
+        </div>
+        <div class="tool-card" onclick="showToolInfo('mailchimp')">
+          <div class="tc-icon">📧</div>
+          <div class="tc-name">Mailchimp</div>
+          <div class="tc-desc">Email marketing platform — build lists, design emails, automate campaigns.</div>
+          <div class="tc-status freemium">Freemium</div>
+        </div>
+      </div>
+
+      <div id="toolInfoBox" style="display:none;margin-top:24px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;"></div>
+    </div>
+
+    <!-- GLOSSARY PAGE -->
+    <div class="page" id="page-glossary">
+      <h1 style="font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:6px">Digital Marketing Glossary</h1>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:28px">Key terms explained in plain English. Grows as you complete modules.</p>
+      <div id="glossaryList"><!-- filled by JS --></div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<script>
+// ── AUTH SYSTEM ──
+let currentUser = null;
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem('dmAcademy_users')) || {}; }
+  catch { return {}; }
+}
+function saveUsers(u) {
+  localStorage.setItem('dmAcademy_users', JSON.stringify(u));
+}
+
+function getStateKey() {
+  return currentUser ? `dmAcademy_${currentUser.username}` : null;
+}
+
+// ── AUTH UI ──
+function showSignup() {
+  document.getElementById('loginCard').style.display = 'none';
+  document.getElementById('signupCard').style.display = 'block';
+  document.getElementById('signupError').classList.remove('show');
+}
+function showLogin() {
+  document.getElementById('signupCard').style.display = 'none';
+  document.getElementById('loginCard').style.display = 'block';
+  document.getElementById('loginError').classList.remove('show');
+}
+
+function handleLogin() {
+  const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+
+  if (!username || !password) {
+    errEl.textContent = 'Please enter both username and password.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const users = getUsers();
+  const user = Object.values(users).find(u => u.username === username || u.email === username);
+
+  if (!user || user.password !== password) {
+    errEl.textContent = 'Invalid username or password.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  errEl.classList.remove('show');
+  currentUser = { username: user.username, name: user.name, email: user.email };
+  localStorage.setItem('dmAcademy_session', JSON.stringify(currentUser));
+  enterApp();
+}
+
+function handleSignup() {
+  const name = document.getElementById('signupName').value.trim();
+  const username = document.getElementById('signupUsername').value.trim().toLowerCase();
+  const password = document.getElementById('signupPassword').value;
+  const errEl = document.getElementById('signupError');
+
+  if (!name || !username || !password) {
+    errEl.textContent = 'Please fill in all fields.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (username.length < 3) {
+    errEl.textContent = 'Username must be at least 3 characters.';
+    errEl.classList.add('show');
+    return;
+  }
+  if (password.length < 4) {
+    errEl.textContent = 'Password must be at least 4 characters.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  const users = getUsers();
+  if (users[username]) {
+    errEl.textContent = 'Username already taken. Please choose another.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  users[username] = { username, name, email: username, password };
+  saveUsers(users);
+  currentUser = { username, name, email: username };
+  localStorage.setItem('dmAcademy_session', JSON.stringify(currentUser));
+  errEl.classList.remove('show');
+  enterApp();
+}
+
+function handleLogout() {
+  // Save current state before logout
+  saveState();
+  currentUser = null;
+  localStorage.removeItem('dmAcademy_session');
+  document.getElementById('authOverlay').classList.remove('hidden');
+  document.getElementById('loginCard').style.display = 'block';
+  document.getElementById('signupCard').style.display = 'none';
+  document.getElementById('loginUsername').value = '';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').classList.remove('show');
+}
+
+function enterApp() {
+  document.getElementById('authOverlay').classList.add('hidden');
+  document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+  document.getElementById('userNameDisplay').textContent = currentUser.name;
+  document.getElementById('heroName').textContent = currentUser.name;
+  loadState();
+  updateUI();
+}
+
+// ── STATE ──
+const state = {
+  xp: 0,
+  completedModules: [],
+  quizScores: {},
+  quizAnswered: {},
+  quizCorrect: {},
+  exerciseAnswers: {},
+  streak: 1,
+  currentPage: 'dashboard'
+};
+
+function loadState() {
+  const key = getStateKey();
+  if (!key) return;
+  const saved = localStorage.getItem(key);
+  if (saved) {
+    Object.assign(state, JSON.parse(saved));
+    Object.assign(quizAnswered, state.quizAnswered);
+    Object.assign(quizCorrect, state.quizCorrect);
+  }
+}
+function saveState() {
+  const key = getStateKey();
+  if (!key) return;
+  state.quizAnswered = quizAnswered;
+  state.quizCorrect = quizCorrect;
+  localStorage.setItem(key, JSON.stringify(state));
+}
+
+// ── MODULE DATA ──
+const modules = [
+  { id: 1, title: "Intro to Marketing & Digital Marketing", desc: "4 Ps, funnels, traditional vs digital, why DM matters", icon: "📘", lessons: 3, prereq: null },
+  { id: 2, title: "SEO Fundamentals", desc: "How Google works, keywords, on-page/off-page, tools", icon: "🔍", lessons: 4, prereq: 1 },
+  { id: 3, title: "Social Media Marketing", desc: "Instagram, Facebook, YouTube, LinkedIn strategy", icon: "📱", lessons: 4, prereq: 2 },
+  { id: 4, title: "Content Marketing", desc: "Blogs, video, podcasts, content calendar, storytelling", icon: "✍️", lessons: 3, prereq: 3 },
+  { id: 5, title: "Email Marketing", desc: "List building, Mailchimp, automation, copywriting", icon: "📧", lessons: 3, prereq: 4 },
+  { id: 6, title: "Google Ads (PPC)", desc: "Search ads, display, Shopping, bidding strategies", icon: "📢", lessons: 4, prereq: 5 },
+  { id: 7, title: "Meta Ads (Facebook & Instagram)", desc: "Audience targeting, ad creatives, ROAS, retargeting", icon: "📘", lessons: 4, prereq: 6 },
+  { id: 8, title: "Analytics & Data", desc: "Google Analytics 4, tracking, attribution, reporting", icon: "📈", lessons: 3, prereq: 7 },
+  { id: 9, title: "Funnels & Conversion Optimization", desc: "Landing pages, A/B testing, CRO, sales funnels", icon: "🔄", lessons: 3, prereq: 8 },
+  { id: 10, title: "Branding", desc: "Brand identity, positioning, voice, visual language", icon: "🎨", lessons: 3, prereq: 9 },
+  { id: 11, title: "Copywriting", desc: "Headlines, AIDA, storytelling, email/ad copy", icon: "💬", lessons: 3, prereq: 10 },
+  { id: 12, title: "Affiliate & Influencer Marketing", desc: "Commission structures, platforms, micro-influencers", icon: "🤝", lessons: 3, prereq: 11 },
+  { id: 13, title: "Local SEO", desc: "Google Business Profile, local citations, maps ranking", icon: "📍", lessons: 3, prereq: 12 },
+  { id: 14, title: "E-commerce Marketing", desc: "Product pages, Shopify SEO, cart abandonment, retargeting", icon: "🛒", lessons: 3, prereq: 13 },
+  { id: 15, title: "Freelancing as a DM", desc: "Finding clients, proposals, pricing, Upwork/Fiverr", icon: "💼", lessons: 3, prereq: 14 },
+  { id: 16, title: "Building a DM Agency", desc: "Team, services, pricing, client retention, scaling", icon: "🏢", lessons: 3, prereq: 15 },
+];
+
+// ── QUIZ DATA ──
+const quizAnswers = {
+  '1-1': 'B', '1-2': 'B', '1-3': 'C', '1-4': 'B', '1-5': 'C',
+  '2-1': 'B', '2-2': 'B', '2-3': 'C', '2-4': 'C',
+};
+
+const quizExplanations = {
+  '1-1-B': '"Promotion" in the 4 Ps refers to all activities that communicate your product\'s value to customers — ads, WhatsApp messages, social media, banners, etc.',
+  '1-1-A': 'That\'s the "Price" P, not Promotion. Price is what you charge; Promotion is how you communicate.',
+  '1-1-C': 'That\'s the "Place" P — where customers can buy your product.',
+  '1-1-D': 'Product quality belongs to the "Product" P — what you\'re selling.',
+  '1-2-B': 'Correct! Real-time measurement is one of digital marketing\'s biggest advantages. You can see exact clicks, conversions, and ROI immediately.',
+  '1-2-A': 'Wrong. Digital marketing is actually more accessible to small businesses than traditional marketing.',
+  '1-2-C': 'Wrong. Digital marketing can start for FREE (organic social media, SEO, email marketing).',
+  '1-2-D': 'Wrong. Every type of business — grocery shops, restaurants, farms, schools — can use digital marketing.',
+  '1-3-C': 'Correct! Awareness always comes first. If nobody knows you exist, they can\'t move to Interest, Desire, or Action.',
+  '1-3-A': 'Wrong. Action (purchase) is near the BOTTOM of the funnel — it happens after Awareness, Interest, and Desire.',
+  '1-4-B': 'Correct! Meesho used WhatsApp sharing and social media ads targeting housewives and Tier-2/3 city residents — a brilliant digital-first strategy.',
+  '1-5-C': 'Correct! Newspaper advertising is Traditional Marketing, not Digital Marketing.',
+  '2-1-B': 'Correct! SEO = Search Engine Optimization. The goal is to optimize your website to rank higher in search results.',
+  '2-2-B': 'Correct! Long-tail keywords are 3+ word phrases that are more specific, have less competition, and are easier to rank for.',
+  '2-3-C': 'Correct! Google\'s process is: Crawl (bots visit pages) → Index (save in database) → Rank (show in results based on relevance).',
+  '2-4-C': 'Correct! Google Search Console is completely free and provided by Google. It shows you what searches bring people to your site.',
+};
+
+// ── QUIZ LOGIC ──
+let quizAnswered = {};
+let quizCorrect = {};
+
+function answerQuiz(moduleId, questionNum, option) {
+  const key = `${moduleId}-${questionNum}`;
+  if (quizAnswered[key]) return;
+  quizAnswered[key] = true;
+
+  const correct = quizAnswers[key];
+  const isRight = option === correct;
+  if (isRight && !quizCorrect[key]) {
+    quizCorrect[key] = true;
+  }
+
+  const qEl = document.querySelectorAll(`#quiz${moduleId} .quiz-question`)[questionNum - 1];
+  const options = qEl.querySelectorAll('.quiz-option');
+  const letters = ['A','B','C','D'];
+  options.forEach((opt, i) => {
+    const letter = letters[i];
+    if (letter === correct) opt.classList.add('correct');
+    else if (letter === option && !isRight) opt.classList.add('wrong');
+  });
+
+  const fbKey = `${key}-${option}`;
+  const fbEl = document.getElementById(`qfb${moduleId}-${questionNum}`);
+  if (fbEl) {
+    const explanation = quizExplanations[fbKey] || (isRight ? '✅ Correct!' : '❌ Incorrect. Try reviewing the lesson content.');
+    fbEl.textContent = (isRight ? '✅ ' : '❌ ') + explanation;
+    fbEl.className = `quiz-feedback show ${isRight ? 'correct-fb' : 'wrong-fb'}`;
+  }
+
+  updateQuizProgress(moduleId);
+}
+
+function updateQuizProgress(moduleId) {
+  const total = moduleId === 1 ? 5 : 4;
+  let answered = 0, correct = 0;
+  for (let i = 1; i <= total; i++) {
+    if (quizAnswered[`${moduleId}-${i}`]) answered++;
+    if (quizCorrect[`${moduleId}-${i}`]) correct++;
+  }
+  const prog = document.getElementById(`qprog${moduleId}`);
+  if (prog) prog.textContent = `${answered} / ${total} answered`;
+
+  const needed = moduleId === 1 ? 3 : 3;
+  const completebtn = document.getElementById(`completebtn${moduleId}`);
+
+  if (correct >= needed && answered >= total) {
+    const resultEl = document.getElementById(`quizResult${moduleId}`);
+    if (resultEl) {
+      resultEl.style.display = 'block';
+      resultEl.innerHTML = `<strong>🎉 Quiz Passed! ${correct}/${total} correct.</strong><br>You've earned <strong>+100 XP</strong> for completing this module's quiz! Click the button below to unlock the next module.`;
+    }
+    if (completebtn) {
+      completebtn.disabled = false;
+      completebtn.textContent = '✅ Complete Module ' + moduleId;
+      completebtn.className = 'btn btn-green';
+    }
+    state.quizScores[moduleId] = correct;
+    saveState();
+  }
+}
+
+function completeLesson(moduleId) {
+  if (!state.completedModules.includes(moduleId)) {
+    state.completedModules.push(moduleId);
+    state.xp += 100;
+    saveState();
+  }
+  updateUI();
+  if (moduleId < 16) {
+    const nextId = moduleId + 1;
+    setTimeout(() => {
+      showLesson(nextId);
+      const toast = document.createElement('div');
+      toast.style.cssText = `position:fixed;top:20px;right:20px;background:#00b96b;color:#fff;padding:14px 22px;border-radius:10px;font-size:14px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(0,185,107,0.4)`;
+      toast.textContent = `🎉 Module ${moduleId} Complete! +100 XP — Module ${nextId} Unlocked!`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }, 200);
+  } else {
+    showPage('dashboard');
+  }
+}
+
+// ── EXERCISE SAVE ──
+function saveExercise(lessonId) {
+  const ta = document.querySelector(`#page-lesson${lessonId} .ex-textarea`);
+  if (ta && ta.value.trim()) {
+    state.exerciseAnswers[lessonId] = ta.value;
+    saveState();
+    const btn = ta.nextElementSibling.querySelector('button');
+    btn.textContent = '✅ Saved!';
+    btn.className = 'btn btn-green';
+    setTimeout(() => {
+      btn.textContent = '💾 Save My Answer';
+      btn.className = 'btn btn-gold';
+    }, 2000);
+  }
+}
+
+function restoreExercise(lessonId) {
+  const ta = document.querySelector(`#page-lesson${lessonId} .ex-textarea`);
+  if (ta && state.exerciseAnswers[lessonId]) ta.value = state.exerciseAnswers[lessonId];
+}
+
+function restoreQuiz(moduleId) {
+  const total = moduleId === 1 ? 5 : 4;
+  const letters = ['A','B','C','D'];
+  for (let q = 1; q <= total; q++) {
+    const key = `${moduleId}-${q}`;
+    if (!quizAnswered[key]) continue;
+    const qEl = document.querySelectorAll(`#quiz${moduleId} .quiz-question`)[q - 1];
+    if (!qEl) continue;
+    const options = qEl.querySelectorAll('.quiz-option');
+    const correct = quizAnswers[key];
+    options.forEach((opt, i) => {
+      const letter = letters[i];
+      if (letter === correct) opt.classList.add('correct');
+    });
+    const fbEl = document.getElementById(`qfb${moduleId}-${q}`);
+    if (fbEl && quizCorrect[key]) {
+      fbEl.textContent = '✅ ' + (quizExplanations[`${key}-${correct}`] || 'Correct!');
+      fbEl.className = 'quiz-feedback show correct-fb';
+    } else if (fbEl) {
+      fbEl.textContent = '❌ ' + (quizExplanations[`${key}-wrong`] || 'Answered. Review the lesson content.');
+      fbEl.className = 'quiz-feedback show wrong-fb';
+    }
+  }
+  updateQuizProgress(moduleId);
+}
+
+// ── NAVIGATION ──
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById(`page-${pageId}`);
+  if (pg) pg.classList.add('active');
+  state.currentPage = pageId;
+
+  const navMap = { dashboard: 0, progress: 1, tools: 2, glossary: 3 };
+  const idx = navMap[pageId];
+  if (idx !== undefined) {
+    document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
+  }
+
+  const breadcrumbs = {
+    dashboard: '<strong>Dashboard</strong> — Digital Marketing Academy',
+    progress: '<strong>My Progress</strong> — Track your journey',
+    tools: '<strong>Tools Guide</strong> — Industry tools',
+    glossary: '<strong>Glossary</strong> — Key terms'
+  };
+  document.getElementById('breadcrumb').innerHTML = breadcrumbs[pageId] || '<strong>Dashboard</strong>';
+
+  if (pageId === 'progress') renderProgress();
+  if (pageId === 'glossary') renderGlossary();
+
+  if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0, 0);
+}
+
+function showLesson(moduleId) {
+  const mod = modules[moduleId - 1];
+  const isUnlocked = moduleId === 1 || state.completedModules.includes(moduleId - 1);
+
+  if (!isUnlocked) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-locked').classList.add('active');
+    document.getElementById('breadcrumb').innerHTML = `<strong>🔒 Module ${moduleId} Locked</strong>`;
+    return;
+  }
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const lessPage = document.getElementById(`page-lesson${moduleId}`);
+
+  if (lessPage) {
+    lessPage.classList.add('active');
+    restoreExercise(moduleId);
+    restoreQuiz(moduleId);
+  } else {
+    document.getElementById('page-locked').innerHTML = `
+      <div style="text-align:center;padding:80px 20px;">
+        <div style="font-size:64px;margin-bottom:16px;">${mod.icon}</div>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:12px">${mod.title}</h2>
+        <div style="background:var(--cream);border-radius:12px;padding:20px;max-width:500px;margin:0 auto 24px;text-align:left;font-size:14px;line-height:1.7">
+          <p style="font-weight:600;margin-bottom:10px">🎉 Module ${moduleId} Unlocked!</p>
+          <p>This module is <strong>ready to be taught</strong>. As your AI mentor, I'll teach you ${mod.title} in your next chat session. Here's what you'll learn:</p>
+          <p style="margin-top:10px;color:var(--muted)">${mod.desc}</p>
+          <p style="margin-top:12px"><strong>Covers:</strong> ${mod.lessons} in-depth lessons, exercises, a quiz, homework, and a case study.</p>
+        </div>
+        <p style="color:var(--muted);font-size:14px;margin-bottom:20px">Continue the full lesson in the Claude chat — your mentor will teach you everything!</p>
+        <button class="btn btn-primary" onclick="showPage('dashboard')">← Back to Dashboard</button>
+      </div>`;
+    document.getElementById('page-locked').classList.add('active');
+  }
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`nav-${moduleId}`)?.classList.add('active');
+  document.getElementById('breadcrumb').innerHTML = `<strong>Module ${moduleId}</strong> — ${mod.title}`;
+
+  if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+  window.scrollTo(0, 0);
+}
+
+// ── UPDATE UI ──
+function updateUI() {
+  const done = state.completedModules.length;
+  const xp = state.xp;
+  const quizPassed = Object.keys(state.quizScores).length;
+
+  document.getElementById('xpDisplay').textContent = xp;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statQuiz').textContent = quizPassed;
+  document.getElementById('statXP').textContent = xp;
+  document.getElementById('statStreak').textContent = state.streak;
+  document.getElementById('pStatDone').textContent = done;
+  document.getElementById('pStatXP').textContent = xp;
+
+  const pct = Math.round((done / 16) * 100);
+  document.getElementById('ringPct').textContent = pct + '%';
+  const circumference = 138.2;
+  const offset = circumference - (pct / 100) * circumference;
+  document.getElementById('ringCircle').style.strokeDashoffset = offset;
+
+  modules.forEach(mod => {
+    const badge = document.getElementById(`badge-${mod.id}`);
+    if (!badge) return;
+    if (state.completedModules.includes(mod.id)) {
+      badge.textContent = '✓ Done';
+      badge.className = 'badge done';
+    } else if (mod.id === 1 || state.completedModules.includes(mod.id - 1)) {
+      badge.textContent = 'Active';
+      badge.className = 'badge';
+    } else {
+      badge.textContent = '🔒';
+      badge.className = 'badge locked';
+    }
+  });
+
+  renderModuleGrid();
+}
+
+function renderModuleGrid() {
+  const grid = document.getElementById('moduleGrid');
+  if (!grid) return;
+  grid.innerHTML = modules.map(mod => {
+    const done = state.completedModules.includes(mod.id);
+    const unlocked = mod.id === 1 || state.completedModules.includes(mod.id - 1);
+    const active = unlocked && !done;
+    const pct = done ? 100 : (active ? 10 : 0);
+    return `
+      <div class="module-card ${done?'completed':''} ${active?'active-card':''} ${!unlocked?'locked':''}"
+           onclick="${unlocked ? `showLesson(${mod.id})` : ''}">
+        <div class="mc-num">Module ${mod.id} ${done ? '· ✅ Complete' : active ? '· 🟠 In Progress' : '· 🔒 Locked'}</div>
+        <div class="mc-status">${mod.icon}</div>
+        <h3>${mod.title}</h3>
+        <p>${mod.desc}</p>
+        <div class="mc-bar"><div class="mc-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+  }).join('');
+}
+
+function renderProgress() {
+  const list = document.getElementById('progressList');
+  if (!list) return;
+  list.innerHTML = modules.map(mod => {
+    const done = state.completedModules.includes(mod.id);
+    const unlocked = mod.id === 1 || state.completedModules.includes(mod.id - 1);
+    const score = state.quizScores[mod.id];
+    const pct = done ? 100 : (unlocked ? 5 : 0);
+    const status = done ? 'done' : unlocked ? 'active' : 'locked';
+    return `
+      <div class="prog-row">
+        <div class="prog-icon ${status}">${mod.icon}</div>
+        <div class="prog-info">
+          <div class="pi-title">Module ${mod.id}: ${mod.title}</div>
+          <div class="pi-sub">${done ? `✅ Completed · Quiz: ${score||0}/${mod.id===1?5:4} correct` : unlocked ? '🟠 In Progress' : '🔒 Locked — Complete previous module'}</div>
+        </div>
+        <div class="prog-bar-wrap">
+          <div class="prog-bar"><div class="prog-bar-inner ${done?'done':''}" style="width:${pct}%"></div></div>
+          <div class="prog-pct">${pct}%</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── GLOSSARY ──
+const glossaryTerms = [
+  { term: "SEO", def: "Search Engine Optimization — optimizing your website to rank higher in search engines like Google organically (for free)." },
+  { term: "PPC", def: "Pay-Per-Click — a paid advertising model where you pay only when someone clicks your ad." },
+  { term: "CTR", def: "Click-Through Rate — the percentage of people who saw your ad/post and actually clicked it. Formula: (Clicks ÷ Impressions) × 100." },
+  { term: "Conversion", def: "When a visitor takes the desired action — making a purchase, signing up, calling, etc." },
+  { term: "ROAS", def: "Return On Ad Spend — how much revenue you make for every rupee spent on ads. ROAS of 4x means ₹400 revenue per ₹100 spent." },
+  { term: "Organic Traffic", def: "Visitors who find your website through unpaid search results (SEO), not through ads." },
+  { term: "Bounce Rate", def: "Percentage of visitors who leave your website after viewing only one page without taking any action." },
+  { term: "Landing Page", def: "A single web page designed specifically to convert visitors — usually linked from an ad or email." },
+  { term: "CTA", def: "Call To Action — a button or text that tells visitors what to do next. Examples: 'Buy Now', 'Contact Us', 'Download Free Guide'." },
+  { term: "Impression", def: "Each time your ad, post, or content is shown to someone — even if they don't click it." },
+  { term: "4 Ps of Marketing", def: "Product, Price, Place, Promotion — the four fundamental elements of any marketing strategy." },
+  { term: "Customer Funnel", def: "The journey a customer takes from first discovering your brand to making a purchase and becoming a loyal customer." },
+  { term: "Keyword", def: "A word or phrase people type into search engines. SEO and Google Ads strategies are built around targeting the right keywords." },
+  { term: "Backlink", def: "When another website links to your website. Backlinks are a major factor in SEO — they signal trust and authority to Google." },
+  { term: "ROI", def: "Return On Investment — measures the profit earned compared to what was spent. ROI of 200% means you doubled your money." },
+];
+
+function renderGlossary() {
+  const list = document.getElementById('glossaryList');
+  if (!list) return;
+  list.innerHTML = glossaryTerms.map(g => `
+    <div class="definition-box" style="margin-bottom:10px">
+      <strong>${g.term}</strong>
+      ${g.def}
+    </div>`).join('');
+}
+
+// ── TOOLS INFO ──
+const toolInfo = {
+  ga: { name: 'Google Analytics 4', icon: '📊', desc: 'Google Analytics is the most widely used website analytics tool in the world. It tells you who visits your website, where they come from, what pages they view, and what actions they take.', use: 'Use it to: Track website traffic, find your best traffic sources, measure conversions, understand user behavior, and create reports to prove your marketing ROI.', module: 'Module 8: Analytics & Data', link: 'https://analytics.google.com' },
+  gsc: { name: 'Google Search Console', icon: '🔍', desc: 'A free tool by Google that shows you how your website performs in Google Search. You can see which keywords bring traffic, which pages rank, and any technical issues Google found.', use: 'Use it to: Monitor search rankings, find high-value keywords, submit sitemaps, fix errors, and understand click-through rates.', module: 'Module 2: SEO Fundamentals', link: 'https://search.google.com/search-console' },
+  gads: { name: 'Google Ads', icon: '📢', desc: 'Google\'s advertising platform. Run ads on Google Search (when people search keywords), YouTube, Gmail, and millions of websites in the Google Display Network.', use: 'Use it to: Get immediate traffic, target people actively searching for your product, run remarketing campaigns, and measure ad ROI precisely.', module: 'Module 6: Google Ads', link: 'https://ads.google.com' },
+  meta: { name: 'Meta Ads Manager', icon: '📘', desc: 'Facebook & Instagram\'s advertising platform. The most powerful audience targeting tool in digital marketing — you can target by demographics, interests, behaviors, lookalike audiences, and more.', use: 'Use it to: Run Facebook/Instagram ads, create custom audiences from your customers, retarget website visitors, run video ads, and promote your local business.', module: 'Module 7: Meta Ads', link: 'https://www.facebook.com/adsmanager' },
+  canva: { name: 'Canva', icon: '🎨', desc: 'A free online graphic design tool that makes creating professional designs easy for non-designers. Used by millions of marketers for social media posts, ads, presentations, and more.', use: 'Use it to: Create Instagram posts, Facebook ad creatives, YouTube thumbnails, infographics, presentations, business cards, and banners.', module: 'Multiple Modules', link: 'https://www.canva.com' },
+  semrush: { name: 'SEMrush', icon: '🔎', desc: 'One of the most comprehensive SEO and digital marketing tools. Used by professional marketers for keyword research, competitor analysis, site auditing, and content planning.', use: 'Use it to: Find high-value keywords, analyse competitor strategies, audit your website for SEO issues, track rankings, and plan content.', module: 'Module 2: SEO Fundamentals', link: 'https://www.semrush.com' },
+  ahrefs: { name: 'Ahrefs', icon: '🔗', desc: 'The gold standard tool for backlink analysis and SEO. Trusted by the world\'s top SEO professionals. Has the largest backlink index of any tool.', use: 'Use it to: Analyse competitors\' backlink profiles, find link building opportunities, do keyword research, and audit your website.', module: 'Module 2: SEO Fundamentals', link: 'https://ahrefs.com' },
+  hubspot: { name: 'HubSpot', icon: '🧡', desc: 'An all-in-one marketing, sales, and CRM platform. Ideal for businesses that want to manage their entire customer journey in one place — from first contact to loyal customer.', use: 'Use it to: Manage contacts, send marketing emails, build landing pages, track deals, and automate follow-ups.', module: 'Module 5: Email Marketing', link: 'https://www.hubspot.com' },
+  mailchimp: { name: 'Mailchimp', icon: '📧', desc: 'The world\'s most popular email marketing platform. Free for up to 500 subscribers. Perfect for beginners learning email marketing.', use: 'Use it to: Build email lists, design professional emails, send automated welcome sequences, and track open rates and click rates.', module: 'Module 5: Email Marketing', link: 'https://mailchimp.com' },
+};
+
+function showToolInfo(id) {
+  const t = toolInfo[id];
+  const box = document.getElementById('toolInfoBox');
+  box.style.display = 'block';
+  box.innerHTML = `
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+      <div style="font-size:36px">${t.icon}</div>
+      <div>
+        <h2 style="font-size:20px;font-weight:700">${t.name}</h2>
+        <div style="font-size:12px;color:var(--muted)">Covered in: ${t.module}</div>
+      </div>
+    </div>
+    <p style="font-size:14px;line-height:1.65;margin-bottom:12px">${t.desc}</p>
+    <div style="background:var(--cream);border-radius:8px;padding:14px;font-size:14px;margin-bottom:16px"><strong>How you'll use it:</strong> ${t.use}</div>
+    <a href="${t.link}" target="_blank" class="btn btn-secondary" style="font-size:13px">🔗 Open ${t.name} →</a>
+  `;
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ── MOBILE SIDEBAR ──
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ── INIT ──
+(function initAuth() {
+  const session = localStorage.getItem('dmAcademy_session');
+  if (session) {
+    try {
+      currentUser = JSON.parse(session);
+      enterApp();
+    } catch {
+      currentUser = null;
+    }
+  }
+  if (!currentUser) {
+    document.getElementById('authOverlay').classList.remove('hidden');
+  }
+})();
+</script>
+</body>
+</html>
