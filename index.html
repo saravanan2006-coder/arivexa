@@ -1006,59 +1006,67 @@ function showLogin() {
 }
 
 function handleLogin() {
-  const username = document.getElementById('loginUsername').value.trim().toLowerCase();
-  const password = document.getElementById('loginPassword').value;
-  const errEl = document.getElementById('loginError');
-  if (!username || !password) {
-    errEl.textContent = 'Please enter both username and password.';
-    errEl.classList.add('show');
-    return;
+  try {
+    const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value;
+    const errEl = document.getElementById('loginError');
+    if (!username || !password) {
+      errEl.textContent = 'Please enter both username and password.';
+      errEl.classList.add('show');
+      return;
+    }
+    const users = getUsers();
+    const user = Object.values(users).find(u => u.username === username || u.email === username);
+    if (!user || user.password !== password) {
+      errEl.textContent = 'Invalid username or password.';
+      errEl.classList.add('show');
+      return;
+    }
+    errEl.classList.remove('show');
+    currentUser = { username: user.username, name: user.name, email: user.email };
+    localStorage.setItem('dmAcademy_session', JSON.stringify(currentUser));
+    enterApp();
+  } catch(e) {
+    alert('Login error: ' + e.message + '\\n' + e.stack);
   }
-  const users = getUsers();
-  const user = Object.values(users).find(u => u.username === username || u.email === username);
-  if (!user || user.password !== password) {
-    errEl.textContent = 'Invalid username or password.';
-    errEl.classList.add('show');
-    return;
-  }
-  errEl.classList.remove('show');
-  currentUser = { username: user.username, name: user.name, email: user.email };
-  localStorage.setItem('dmAcademy_session', JSON.stringify(currentUser));
-  enterApp();
 }
 
 function handleSignup() {
-  const name = document.getElementById('signupName').value.trim();
-  const username = document.getElementById('signupUsername').value.trim().toLowerCase();
-  const password = document.getElementById('signupPassword').value;
-  const errEl = document.getElementById('signupError');
-  if (!name || !username || !password) {
-    errEl.textContent = 'Please fill in all fields.';
-    errEl.classList.add('show');
-    return;
+  try {
+    const name = document.getElementById('signupName').value.trim();
+    const username = document.getElementById('signupUsername').value.trim().toLowerCase();
+    const password = document.getElementById('signupPassword').value;
+    const errEl = document.getElementById('signupError');
+    if (!name || !username || !password) {
+      errEl.textContent = 'Please fill in all fields.';
+      errEl.classList.add('show');
+      return;
+    }
+    if (username.length < 3) {
+      errEl.textContent = 'Username must be at least 3 characters.';
+      errEl.classList.add('show');
+      return;
+    }
+    if (password.length < 4) {
+      errEl.textContent = 'Password must be at least 4 characters.';
+      errEl.classList.add('show');
+      return;
+    }
+    const users = getUsers();
+    if (users[username]) {
+      errEl.textContent = 'Username already taken. Please choose another.';
+      errEl.classList.add('show');
+      return;
+    }
+    users[username] = { username, name, email: username, password };
+    saveUsers(users);
+    currentUser = { username, name, email: username };
+    localStorage.setItem('dmAcademy_session', JSON.stringify(currentUser));
+    errEl.classList.remove('show');
+    enterApp();
+  } catch(e) {
+    alert('Signup error: ' + e.message + '\\n' + e.stack);
   }
-  if (username.length < 3) {
-    errEl.textContent = 'Username must be at least 3 characters.';
-    errEl.classList.add('show');
-    return;
-  }
-  if (password.length < 4) {
-    errEl.textContent = 'Password must be at least 4 characters.';
-    errEl.classList.add('show');
-    return;
-  }
-  const users = getUsers();
-  if (users[username]) {
-    errEl.textContent = 'Username already taken. Please choose another.';
-    errEl.classList.add('show');
-    return;
-  }
-  users[username] = { username, name, email: username, password };
-  saveUsers(users);
-  currentUser = { username, name, email: username };
-  localStorage.setItem('dmAcademy_session', JSON.stringify(currentUser));
-  errEl.classList.remove('show');
-  enterApp();
 }
 
 function handleLogout() {
@@ -2981,17 +2989,22 @@ function toggleSidebar() {
 
 // ── INIT ──
 (function initAuth() {
-  const session = localStorage.getItem('dmAcademy_session');
-  if (session) {
-    try {
-      currentUser = JSON.parse(session);
-      enterApp();
-    } catch {
-      currentUser = null;
+  try {
+    const session = localStorage.getItem('dmAcademy_session');
+    if (session) {
+      try {
+        currentUser = JSON.parse(session);
+        enterApp();
+      } catch {
+        currentUser = null;
+      }
     }
-  }
-  if (!currentUser) {
-    document.getElementById('authOverlay').classList.remove('hidden');
+    if (!currentUser) {
+      document.getElementById('authOverlay').classList.remove('hidden');
+    }
+  } catch(e) {
+    document.getElementById('authOverlay') && (document.getElementById('authOverlay').classList.remove('hidden'));
+    console.error('Init error:', e);
   }
 })();
 </script>
