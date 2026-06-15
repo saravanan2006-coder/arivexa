@@ -1086,6 +1086,13 @@ function enterApp() {
   document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
   document.getElementById('userNameDisplay').textContent = currentUser.name;
   document.getElementById('heroName').textContent = currentUser.name;
+  state.xp = 0;
+  state.completedModules = [];
+  state.quizScores = {};
+  state.exerciseAnswers = {};
+  state.streak = 1;
+  state.currentPage = 'dashboard';
+  if (typeof quizAnswered !== 'undefined') { quizAnswered = {}; quizCorrect = {}; }
   loadState();
   showPage('dashboard');
   updateUI();
