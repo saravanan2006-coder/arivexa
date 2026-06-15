@@ -1087,7 +1087,7 @@ function enterApp() {
   document.getElementById('userNameDisplay').textContent = currentUser.name;
   document.getElementById('heroName').textContent = currentUser.name;
   loadState();
-  updateUI();
+  if (typeof updateUI === 'function') updateUI();
 }
 
 // ── STATE ──
@@ -1146,7 +1146,9 @@ const modules = [
   { id: 22, title: "Real Client Projects & Portfolio Mastery", desc: "Case studies, portfolio building, client work, testimonials", icon: "📂", lessons: 3, prereq: 21 },
   { id: 23, title: "Digital Marketing Job Preparation & Interview Mastery", desc: "Resume, LinkedIn, interviews, STAR method, career paths", icon: "🎯", lessons: 3, prereq: 22 },
 ];
+</script>
 
+<script>
 const moduleContent = {
 
   // ── Module 1: Intro to Marketing & Digital Marketing ──
@@ -1269,7 +1271,7 @@ Most beginners only focus on the bottom of the funnel (Action = making sales). B
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 2: Marketing Fundamentals & Consumer Psychology ──
   2: {
@@ -1434,7 +1436,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 3: Consumer Behavior & Market Research Mastery ──
   3: {
@@ -1480,7 +1482,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 4: Branding & Brand Strategy Mastery ──
   4: {
@@ -1525,7 +1527,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 5: Website Fundamentals & Landing Page Mastery ──
   5: {
@@ -1570,7 +1572,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 6: Content Marketing Mastery ──
   6: {
@@ -1616,7 +1618,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 7: Copywriting & Persuasive Communication Mastery ──
   7: {
@@ -1644,7 +1646,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
     exercise: {
       title: "Exercise — Copywriting & Persuasive Communication Mastery",
       tasks: [
-        "Search "Digital Marketing Course."",
+        "Search \"Digital Marketing Course.\"",
           "List the first 10 organic results."
       ],
       placeholder: "Write your answers here..."
@@ -1661,7 +1663,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 8: Search Engine Optimization (SEO) Foundations ──
   8: {
@@ -1706,7 +1708,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 9: Advanced SEO Mastery ──
   9: {
@@ -1751,7 +1753,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 10: Social Media Marketing Mastery ──
   10: {
@@ -1796,7 +1798,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 11: Meta Ads (Facebook & Instagram Advertising) Mastery ──
   11: {
@@ -1824,7 +1826,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
     exercise: {
       title: "Exercise — Meta Ads (Facebook & Instagram Advertising) Mastery",
       tasks: [
-        "Search for "Digital Marketing Course."",
+        "Search for \"Digital Marketing Course.\"",
           "Identify all paid advertisements."
       ],
       placeholder: "Write your answers here..."
@@ -1841,7 +1843,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 12: Google Ads Mastery ──
   12: {
@@ -1885,7 +1887,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 13: Email Marketing & Marketing Automation Mastery ──
   13: {
@@ -1931,7 +1933,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 14: Marketing Funnels & Lead Generation Mastery ──
   14: {
@@ -1976,7 +1978,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 15: Conversion Rate Optimization (CRO) Mastery ──
   15: {
@@ -2020,7 +2022,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 16: E-Commerce Marketing Mastery ──
   16: {
@@ -2064,7 +2066,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 17: Affiliate Marketing Mastery ──
   17: {
@@ -2108,7 +2110,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 18: Influencer Marketing Mastery ──
   18: {
@@ -2152,7 +2154,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 19: Freelancing & Client Acquisition Mastery ──
   19: {
@@ -2197,7 +2199,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 20: Digital Marketing Agency Building Mastery ──
   20: {
@@ -2241,7 +2243,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 21: AI-Powered Digital Marketing Mastery ──
   21: {
@@ -2285,7 +2287,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 22: Real Client Projects & Professional Portfolio Mastery ──
   22: {
@@ -2330,7 +2332,7 @@ Your USP should be specific, memorable, and focused on a real customer benefit. 
         "Submit the practical exercise",
         "Review case studies and take notes"
     ]
-  }
+  },
 
   // ── Module 23: Digital Marketing Job Preparation & Interview Mastery ──
   23: {
