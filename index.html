@@ -818,7 +818,7 @@
       <div class="nav-item" onclick="showLesson(21)" id="nav-21"><span class="icon">🤖</span> M21: AI Marketing <span class="badge locked" id="badge-21">🔒</span></div>
       <div class="nav-item" onclick="showLesson(22)" id="nav-22"><span class="icon">📂</span> M22: Client Projects <span class="badge locked" id="badge-22">🔒</span></div>
       <div class="nav-item" onclick="showLesson(23)" id="nav-23"><span class="icon">🎯</span> M23: Job Prep <span class="badge locked" id="badge-23">🔒</span></div>
-    </div></div>
+    </div>
 
     <div class="nav-item logout-item" onclick="handleLogout()"><span class="icon">🚪</span> Sign Out</div>
   </nav>
@@ -1087,7 +1087,8 @@ function enterApp() {
   document.getElementById('userNameDisplay').textContent = currentUser.name;
   document.getElementById('heroName').textContent = currentUser.name;
   loadState();
-  if (typeof updateUI === 'function') updateUI();
+  showPage('dashboard');
+  updateUI();
 }
 
 // ── STATE ──
@@ -1121,7 +1122,7 @@ function saveState() {
 }
 
 // ── MODULE DATA ──
-const modules = [
+var modules = [
   { id: 1, title: "Intro to Marketing & Digital Marketing", desc: "4 Ps, funnels, traditional vs digital, why DM matters", icon: "📘", lessons: 3, prereq: null },
   { id: 2, title: "Marketing Fundamentals & Consumer Psychology", desc: "Consumer psychology, STP framework, personas, 4Ps/7Ps", icon: "🧠", lessons: 3, prereq: 1 },
   { id: 3, title: "Consumer Behavior & Market Research Mastery", desc: "Buying behavior, market research, pain points, competitor analysis", icon: "🔬", lessons: 3, prereq: 2 },
@@ -2873,6 +2874,10 @@ function updateUI() {
 function renderModuleGrid() {
   const grid = document.getElementById('moduleGrid');
   if (!grid) return;
+  if (!modules || !modules.length) {
+    grid.innerHTML = '<p style="color:var(--muted);padding:20px">Loading modules…</p>';
+    return;
+  }
   grid.innerHTML = modules.map(mod => {
     const done = state.completedModules.includes(mod.id);
     const unlocked = mod.id === 1 || state.completedModules.includes(mod.id - 1);
